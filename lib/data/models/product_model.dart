@@ -56,16 +56,8 @@ class ProductModel extends Product {
       );
     }
 
-    // Valida e obtém o campo 'image'
-    final image = json['image'];
-    if (image == null) {
-      throw const FormatException('Field "image" is required');
-    }
-    if (image is! String) {
-      throw FormatException(
-        'Field "image" must be a string, got: ${image.runtimeType}',
-      );
-    }
+    // Obtém imagem: DummyJSON usa 'thumbnail', FakeStore usava 'image'
+    final image = json['thumbnail'] as String? ?? json['image'] as String? ?? '';
 
     // Obtém o campo 'favorite' (opcional, padrão false)
     final favorite = json['favorite'] as bool? ?? false;
@@ -88,7 +80,7 @@ class ProductModel extends Product {
       'id': id,
       'title': title,
       'price': price,
-      'image': image,
+      'thumbnail': image,
       'favorite': favorite,
       'description': description,
       'category': category,
