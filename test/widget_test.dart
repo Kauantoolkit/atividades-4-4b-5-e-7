@@ -5,9 +5,13 @@ import 'package:mobile_arquitetura_01/domain/entities/product.dart';
 import 'package:mobile_arquitetura_01/domain/repositories/product_repository.dart';
 import 'package:mobile_arquitetura_01/presentation/viewmodels/product_viewmodel.dart';
 import 'package:mobile_arquitetura_01/presentation/pages/product_page.dart';
+import 'package:mobile_arquitetura_01/data/services/session_service.dart';
 
 // Mock class for ProductRepository
 class MockProductRepository extends Mock implements ProductRepository {}
+
+// SessionService real (sem mock necessário para testes básicos)
+final _sessionService = SessionService();
 
 void main() {
   late MockProductRepository mockRepository;
@@ -28,7 +32,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: ProductPage(viewModel: viewModel),
+          home: ProductPage(viewModel: viewModel, sessionService: _sessionService),
         ),
       );
 
@@ -53,7 +57,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: ProductPage(viewModel: viewModel),
+          home: ProductPage(viewModel: viewModel, sessionService: _sessionService),
         ),
       );
 
@@ -82,7 +86,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: ProductPage(viewModel: viewModel),
+          home: ProductPage(viewModel: viewModel, sessionService: _sessionService),
         ),
       );
 
@@ -108,7 +112,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: ProductPage(viewModel: viewModel),
+          home: ProductPage(viewModel: viewModel, sessionService: _sessionService),
         ),
       );
 
@@ -131,7 +135,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: ProductPage(viewModel: viewModel),
+          home: ProductPage(viewModel: viewModel, sessionService: _sessionService),
         ),
       );
 

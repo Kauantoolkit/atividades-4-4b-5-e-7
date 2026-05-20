@@ -174,19 +174,14 @@ class _ProductFormPageState extends State<ProductFormPage> {
                       prefixIcon: Icon(Icons.category),
                     ),
                     items: const [
-                      DropdownMenuItem(
-                        value: 'electronics',
-                        child: Text('Eletrônicos'),
-                      ),
-                      DropdownMenuItem(value: 'jewelery', child: Text('Joias')),
-                      DropdownMenuItem(
-                        value: 'men\'s clothing',
-                        child: Text('Roupas Masculinas'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'women\'s clothing',
-                        child: Text('Roupas Femininas'),
-                      ),
+                      DropdownMenuItem(value: 'smartphones', child: Text('Smartphones')),
+                      DropdownMenuItem(value: 'laptops', child: Text('Laptops')),
+                      DropdownMenuItem(value: 'fragrances', child: Text('Fragrâncias')),
+                      DropdownMenuItem(value: 'skincare', child: Text('Cuidados com a Pele')),
+                      DropdownMenuItem(value: 'groceries', child: Text('Alimentos')),
+                      DropdownMenuItem(value: 'home-decoration', child: Text('Decoração')),
+                      DropdownMenuItem(value: 'furniture', child: Text('Móveis')),
+                      DropdownMenuItem(value: 'tops', child: Text('Roupas')),
                     ],
                     onChanged: (value) => setState(() => _category = value),
                   ),
