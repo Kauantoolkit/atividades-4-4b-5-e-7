@@ -51,6 +51,28 @@ class HttpClient {
     }
   }
 
+  /// Executa uma requisição GET autenticada (com Bearer token).
+  Future<dynamic> getWithAuth(String url, String token) async {
+    try {
+      final response = await _client
+          .get(Uri.parse(url), headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          })
+          .timeout(timeoutDuration);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return json.decode(response.body);
+      } else {
+        throw Failure('Request failed with status: ${response.statusCode}');
+      }
+    } on Failure {
+      rethrow;
+    } catch (e) {
+      throw Failure('GET auth network error: ${e.toString()}');
+    }
+  }
+
   /// Executa uma requisição POST.
   /// Retorna o corpo da resposta como dynamic.
   Future<dynamic> post(String url, dynamic body) async {
