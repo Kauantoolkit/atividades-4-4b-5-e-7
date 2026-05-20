@@ -26,13 +26,13 @@ class ProductRemoteDatasource {
     }
   }
 
-  /// Cria um novo produto via POST.
+  /// Cria um novo produto via POST /products/add.
   Future<ProductModel> createProduct(ProductModel product) async {
     final response = await _httpClient.post(
-      '$_baseUrl/products', 
+      '$_baseUrl/products/add',
       product.toJson()
     );
-    
+
     return ProductModel.fromJson(response as Map<String, dynamic>);
   }
 

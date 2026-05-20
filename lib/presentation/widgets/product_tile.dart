@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/product.dart';
 
-/// Widget reutilizável que exibe um único produto em um layout de tile.
-/// Exibe a imagem, título, preço formatado e botão de favorito.
+/// Widget reutilizavel que exibe um produto em card compacto para grid.
 class ProductTile extends StatelessWidget {
-  /// O produto a ser exibido.
   final Product product;
-
-  /// Callback chamado quando o botão de favorito é pressionado.
   final VoidCallback? onFavoriteToggle;
-
-  /// Callback chamado quando o tile é tocado (navegar para detalhes).
   final VoidCallback? onTap;
 
-  /// Cria um ProductTile com o produto informado.
   const ProductTile({
     super.key,
     required this.product,
@@ -23,100 +16,179 @@ class ProductTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isFav = product.favorite;
+
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
+      margin: EdgeInsets.zero,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: isFav
+            ? BorderSide(color: colorScheme.primary.withAlpha(120), width: 1.5)
+            : BorderSide(color: colorScheme.outlineVariant.withAlpha(80)),
+      ),
       clipBehavior: Clip.antiAlias,
-      color: product.favorite ? Colors.amber[50] : null,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Imagem do produto com tamanho fixo
-            SizedBox(
-              width: 80,
-              height: 80,
-              child: Image.network(
-                product.image,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[200],
-                    child: const Icon(
-                      Icons.image_not_supported,
-                      color: Colors.grey,
-                      size: 40,
-                    ),
-                  );
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            // Detalhes do produto
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // Image section with overlays
+            AspectRatio(
+              aspectRatio: 1,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Text(
-                    product.title,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  // Background
+                  Container(
+                    color: colorScheme.surfaceContainerHighest.withAlpha(60),
                   ),
-                  const SizedBox(height: 4),
-                  if (product.isPending == true)
-                    Row(
-                      children: [
-                        Icon(Icons.sync, size: 12, color: Colors.orange[700]),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Pendente de sync',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.orange[700],
+                  // Product image
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Image.network(
+                      product.image,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Center(
+                        child: Icon(Icons.image_not_supported_outlined,
+                            color: colorScheme.onSurfaceVariant.withAlpha(100),
+                            size: 40),
+                      ),
+                      loadingBuilder: (_, child, progress) {
+                        if (progress == null) return child;
+                        return Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colorScheme.primary.withAlpha(150),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Favorite button
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Material(
+                      color: colorScheme.surface.withAlpha(230),
+                      shape: const CircleBorder(),
+                      elevation: 1,
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: onFavoriteToggle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(6),
+                          child: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            color: isFav
+                                ? Colors.redAccent
+                                : colorScheme.onSurfaceVariant.withAlpha(150),
+                            size: 18,
                           ),
                         ),
-                      ],
-                    ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${product.price.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.green[700],
-                      fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
+
+                  // Pending sync badge
+                  if (product.isPending == true)
+                    Positioned(
+                      top: 6,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade700,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.sync, size: 10, color: Colors.white),
+                            SizedBox(width: 3),
+                            Text('Sync',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
-            // Botão de favorito
-            IconButton(
-              onPressed: onFavoriteToggle,
-              icon: Icon(
-                product.favorite ? Icons.star : Icons.star_border,
-                color: product.favorite ? Colors.amber[700] : Colors.grey,
-                size: 32,
+
+            // Divider
+            Divider(height: 1, thickness: 1, color: colorScheme.outlineVariant.withAlpha(60)),
+
+            // Product info section
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      product.title,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                        color: colorScheme.onSurface,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    // Category chip
+                    if (product.category != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: colorScheme.secondaryContainer.withAlpha(150),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            product.category!,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: colorScheme.onSecondaryContainer,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    // Price
+                    Text(
+                      '\$${product.price.toStringAsFixed(2)}',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              tooltip: product.favorite
-                  ? 'Remover dos favoritos'
-                  : 'Adicionar aos favoritos',
             ),
           ],
-        ),
         ),
       ),
     );
   }
 }
-

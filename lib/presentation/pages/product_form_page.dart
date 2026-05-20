@@ -45,6 +45,26 @@ class _ProductFormPageState extends State<ProductFormPage> {
     super.dispose();
   }
 
+  static const _defaultCategories = [
+    'beauty', 'fragrances', 'furniture', 'groceries', 'home-decoration',
+    'kitchen-accessories', 'laptops', 'mens-shirts', 'mens-shoes',
+    'mens-watches', 'mobile-accessories', 'motorcycle', 'skin-care',
+    'smartphones', 'sports-accessories', 'sunglasses', 'tablets', 'tops',
+    'vehicle', 'womens-bags', 'womens-dresses', 'womens-jewellery',
+    'womens-shoes', 'womens-watches',
+  ];
+
+  List<DropdownMenuItem<String>> _buildCategoryItems() {
+    final categories = [..._defaultCategories];
+    if (_category != null && !categories.contains(_category)) {
+      categories.add(_category!);
+      categories.sort();
+    }
+    return categories
+        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+        .toList();
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -98,8 +118,18 @@ class _ProductFormPageState extends State<ProductFormPage> {
   Widget build(BuildContext context) {
     final isEdit = widget.viewModel.state.value.selectedProduct != null;
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text(isEdit ? 'Editar Produto' : 'Novo Produto')),
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        title: Text(
+          isEdit ? 'Editar Produto' : 'Novo Produto',
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: ValueListenableBuilder<ProductState>(
         valueListenable: widget.viewModel.state,
         builder: (context, state, child) {
@@ -114,7 +144,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     controller: _titleController,
                     decoration: const InputDecoration(
                       labelText: 'Título *',
-                      border: OutlineInputBorder(),
+
                       prefixIcon: Icon(Icons.title),
                     ),
                     validator: (value) {
@@ -132,7 +162,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     ),
                     decoration: const InputDecoration(
                       labelText: 'Preço (R\$) *',
-                      border: OutlineInputBorder(),
+
                       prefixIcon: Icon(Icons.attach_money),
                       prefixText: 'R\$ ',
                     ),
@@ -151,7 +181,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     controller: _imageController,
                     decoration: const InputDecoration(
                       labelText: 'URL da Imagem',
-                      border: OutlineInputBorder(),
+
                       prefixIcon: Icon(Icons.image),
                       hintText: 'https://example.com/image.jpg',
                     ),
@@ -170,19 +200,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     value: _category,
                     decoration: const InputDecoration(
                       labelText: 'Categoria',
-                      border: OutlineInputBorder(),
+
                       prefixIcon: Icon(Icons.category),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'smartphones', child: Text('Smartphones')),
-                      DropdownMenuItem(value: 'laptops', child: Text('Laptops')),
-                      DropdownMenuItem(value: 'fragrances', child: Text('Fragrâncias')),
-                      DropdownMenuItem(value: 'skincare', child: Text('Cuidados com a Pele')),
-                      DropdownMenuItem(value: 'groceries', child: Text('Alimentos')),
-                      DropdownMenuItem(value: 'home-decoration', child: Text('Decoração')),
-                      DropdownMenuItem(value: 'furniture', child: Text('Móveis')),
-                      DropdownMenuItem(value: 'tops', child: Text('Roupas')),
-                    ],
+                    items: _buildCategoryItems(),
                     onChanged: (value) => setState(() => _category = value),
                   ),
                   const SizedBox(height: 16),
@@ -193,7 +214,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     maxLines: 4,
                     decoration: const InputDecoration(
                       labelText: 'Descrição',
-                      border: OutlineInputBorder(),
+
                       prefixIcon: Icon(Icons.description),
                       alignLabelWithHint: true,
                     ),
@@ -201,58 +222,68 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
                   const SizedBox(height: 32),
 
-                  /// Botões
+                  /// Botoes
                   Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: widget.viewModel.state.value.isSubmitting
-                              ? null
-                              : _submit,
-                          icon: widget.viewModel.state.value.isSubmitting
-                              ? SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.save),
-                          label: Text(
-                            widget.viewModel.state.value.isSubmitting
-                                ? 'Salvando...'
-                                : 'Salvar',
+                        child: SizedBox(
+                          height: 48,
+                          child: FilledButton.icon(
+                            onPressed: widget.viewModel.state.value.isSubmitting
+                                ? null
+                                : _submit,
+                            icon: widget.viewModel.state.value.isSubmitting
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.save_outlined, size: 18),
+                            label: Text(
+                              widget.viewModel.state.value.isSubmitting
+                                  ? 'Salvando...'
+                                  : 'Salvar',
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.close),
-                          label: const Text('Cancelar'),
+                        child: SizedBox(
+                          height: 48,
+                          child: OutlinedButton.icon(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                            label: const Text('Cancelar'),
+                          ),
                         ),
                       ),
                     ],
                   ),
 
-                  /// Erro do formulário
+                  /// Erro do formulario
                   if (widget.viewModel.state.value.formError != null) ...[
                     const SizedBox(height: 16),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red.shade200),
+                        color: colorScheme.errorContainer.withAlpha(80),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.error, color: Colors.red[600]),
-                          const SizedBox(width: 8),
+                          Icon(Icons.error_outline_rounded,
+                              color: colorScheme.error, size: 20),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               widget.viewModel.state.value.formError!,
+                              style: TextStyle(
+                                color: colorScheme.error,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ],
