@@ -22,10 +22,9 @@ class ProductDetailPage extends StatelessWidget {
         title: const Text('Detalhes do Produto'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         leading: IconButton(
-          icon: const Icon(Icons.home),
-          tooltip: 'Voltar ao início',
-          onPressed: () =>
-              Navigator.popUntil(context, ModalRoute.withName(AppRoutes.home)),
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Voltar',
+          onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(

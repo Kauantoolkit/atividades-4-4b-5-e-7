@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../data/services/session_service.dart';
 import '../viewmodels/product_viewmodel.dart';
 import '../widgets/product_tile.dart';
 import '../../domain/entities/product.dart';
@@ -11,8 +12,15 @@ class ProductPage extends StatefulWidget {
   /// O ViewModel que gerencia o estado do produto.
   final ProductViewModel viewModel;
 
+  /// Serviço de sessão para exibir dados do usuário.
+  final SessionService sessionService;
+
   /// Cria uma ProductPage com o ViewModel informado.
-  const ProductPage({super.key, required this.viewModel});
+  const ProductPage({
+    super.key,
+    required this.viewModel,
+    required this.sessionService,
+  });
 
   @override
   State<ProductPage> createState() => _ProductPageState();
@@ -78,12 +86,25 @@ class _ProductPageState extends State<ProductPage> {
         title: const Text('Produtos'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         leading: IconButton(
-          icon: const Icon(Icons.home),
-          tooltip: 'Voltar ao início',
-          onPressed: () =>
-              Navigator.popUntil(context, ModalRoute.withName(AppRoutes.home)),
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Voltar',
+          onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          // Imagem do usuário no AppBar
+          if (widget.sessionService.currentUser != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: GestureDetector(
+                onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundImage: NetworkImage(
+                    widget.sessionService.currentUser!.image,
+                  ),
+                ),
+              ),
+            ),
           // Botão de filtro de favoritos
           ValueListenableBuilder(
             valueListenable: widget.viewModel.state,

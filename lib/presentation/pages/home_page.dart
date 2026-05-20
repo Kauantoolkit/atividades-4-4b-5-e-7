@@ -1,20 +1,50 @@
 import 'package:flutter/material.dart';
+import '../../data/services/session_service.dart';
 import '../viewmodels/product_viewmodel.dart';
 import '../../../main.dart';
 
 /// Tela inicial da aplicação.
-/// Serve como ponto de entrada e apresenta um botão para acessar a listagem de produtos.
+/// Exibe nome do usuário autenticado e botão de logout.
 class HomePage extends StatelessWidget {
   final ProductViewModel viewModel;
+  final SessionService sessionService;
 
-  const HomePage({super.key, required this.viewModel});
+  const HomePage({
+    super.key,
+    required this.viewModel,
+    required this.sessionService,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final user = sessionService.currentUser;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Loja de Produtos'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          if (user != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: GestureDetector(
+                onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundImage: NetworkImage(user.image),
+                ),
+              ),
+            ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
+            onPressed: () async {
+              await sessionService.logout();
+              if (context.mounted) {
+                Navigator.pushReplacementNamed(context, AppRoutes.login);
+              }
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
@@ -29,7 +59,7 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                'Bem-vindo!',
+                user != null ? 'Bem-vindo, ${user.firstName}!' : 'Bem-vindo!',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -47,6 +77,7 @@ class HomePage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
+                    viewModel.loadProducts();
                     Navigator.pushNamed(context, AppRoutes.products);
                   },
                   icon: const Icon(Icons.shopping_bag_outlined),
